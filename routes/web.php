@@ -28,13 +28,18 @@ Route::post('/upload-excel',[DocumentController::class, 'uploadExcel'])
 
 Route::post('/preview', [DocumentController::class, 'preview'])
     ->name('preview');
+
 Route::post('/export-selected-word',[DocumentController::class,'exportSelectedWord'])
     ->name('export.selected.word');
+
 Route::post(
     '/export-excel',
     [DocumentController::class,'exportExcel']
-);
+)->name('export.excel');
+
 Route::get(
     '/export-all-excel',
     [DocumentController::class,'exportAllExcel']
 )->name('export.all.excel');
+
+Route::post('/upload-back', [DocumentController::class, 'uploadBack'])->name('upload.back');
