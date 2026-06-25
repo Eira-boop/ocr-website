@@ -7,6 +7,11 @@ use App\Http\Controllers\UserManagementController;
 
 require __DIR__.'/auth.php';
 
+// === Trang chủ công khai (không cần đăng nhập) ===
+Route::get('/', function () {
+    return view('home');
+});
+
 Route::middleware('auth')->group(function () {
 
     // === Route profile của Breeze ===
@@ -15,7 +20,6 @@ Route::middleware('auth')->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
     // === Chức năng dùng chung: User và Admin đều được dùng ===
-    Route::get('/', [DocumentController::class, 'dashboard']);
     Route::get('/dashboard', [DocumentController::class, 'dashboard'])->name('dashboard');
     Route::get('/ocr', [DocumentController::class, 'index']);
 
