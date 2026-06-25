@@ -1,0 +1,46 @@
+<x-guest-layout>
+
+    <div class="auth-title">Chào mừng <span class="accent">trở lại</span> 🌸</div>
+    <p class="auth-subtext">Đăng nhập để tiếp tục sử dụng hệ thống nhập liệu OCR</p>
+
+    @if (session('status'))
+        <div class="status-box">
+            {{ session('status') }}
+        </div>
+    @endif
+
+    @if ($errors->any())
+        <div class="error-box">
+            <ul>
+                @foreach ($errors->all() as $error)
+                    <li>{{ $error }}</li>
+                @endforeach
+            </ul>
+        </div>
+    @endif
+
+    <form method="POST" action="{{ route('login') }}">
+        @csrf
+
+        <label for="email">Email</label>
+        <input id="email" type="email" name="email" value="{{ old('email') }}" required autofocus autocomplete="username" placeholder="ban@email.com">
+
+        <label for="password">Mật khẩu</label>
+        <input id="password" type="password" name="password" required autocomplete="current-password" placeholder="••••••••">
+
+        <div class="checkbox-row">
+            <input type="checkbox" name="remember" id="remember_me">
+            <label for="remember_me" style="margin:0; font-weight:500;">Ghi nhớ đăng nhập</label>
+        </div>
+
+        <button type="submit" class="btn-auth">Đăng nhập 💗</button>
+
+        <div class="auth-links">
+            @if (Route::has('password.request'))
+                <a href="{{ route('password.request') }}">Quên mật khẩu?</a><br><br>
+            @endif
+            Chưa có tài khoản? <a href="{{ route('register') }}">Đăng ký ngay</a>
+        </div>
+    </form>
+
+</x-guest-layout>
