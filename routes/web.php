@@ -4,13 +4,17 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\DocumentController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\UserManagementController;
-
+use App\Http\Controllers\StatisticsController;
 require __DIR__.'/auth.php';
 
 // === Trang chủ công khai (không cần đăng nhập) ===
 Route::get('/', function () {
     return view('home');
 });
+
+Route::get('/statistics', [StatisticsController::class,'index'])
+    ->middleware('auth')
+    ->name('statistics');
 
 Route::middleware('auth')->group(function () {
 
@@ -37,6 +41,16 @@ Route::middleware('auth')->group(function () {
     Route::get('/documents', [DocumentController::class, 'list'])->name('documents.list');
     Route::get('/documents/{id}', [DocumentController::class, 'show'])->name('documents.show');
 
+    Route::post('/upload-pdf', [DocumentController::class, 'uploadPdf'])
+    ->name('upload.pdf');
+    
+    Route::put('/documents/{id}/update-extracted', [DocumentController::class, 'updateExtracted'])
+    ->name('documents.updateExtracted');
+
+    Route::get('/ocr', [DocumentController::class, 'index'])->name('ocr');
+    // === Thêm dòng này ===
+Route::get('/ocr/reuse-last', [DocumentController::class, 'reuseLast'])
+     ->name('ocr.reuse-last');
     // === Chức năng CHỈ ADMIN ===
     Route::middleware('admin')->group(function () {
         Route::delete('/documents/{id}', [DocumentController::class, 'destroy'])->name('documents.destroy');
@@ -47,4 +61,5 @@ Route::middleware('auth')->group(function () {
         Route::patch('/users/{id}/role', [UserManagementController::class, 'updateRole'])->name('users.updateRole');
         Route::delete('/users/{id}', [UserManagementController::class, 'destroy'])->name('users.destroy');
     });
+    
 });

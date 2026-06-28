@@ -1,565 +1,1483 @@
-<!DOCTYPE html>
-<html lang="vi">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>OCR CCCD</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Quicksand:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <style>
-        :root {
-            --bg: #fdf6ff;
-            --bg-2: #fff0f6;
-            --ink: #4a3b52;
-            --ink-soft: #8a7a92;
-            --white: #ffffff;
-            --pink: #ff8fb1;
-            --pink-deep: #ff6fa0;
-            --lilac: #b9a3ff;
-            --lilac-deep: #9b7df0;
-            --mint: #6fe3c4;
-            --mint-deep: #3ecfa8;
-            --yellow: #ffd166;
-            --line: #f3def0;
-        }
+@extends('layouts.ocr')
 
-        * { margin: 0; padding: 0; box-sizing: border-box; }
+@section('title','OCR Document Management')
 
-        body {
-            font-family: 'Quicksand', sans-serif;
-            background:
-                radial-gradient(circle at 8% 12%, rgba(255, 143, 177, 0.16), transparent 40%),
-                radial-gradient(circle at 92% 18%, rgba(185, 163, 255, 0.18), transparent 42%),
-                radial-gradient(circle at 50% 95%, rgba(111, 227, 196, 0.14), transparent 45%),
-                var(--bg);
-            min-height: 100vh;
-            color: var(--ink);
-            position: relative;
-            overflow-x: hidden;
-        }
+@section('content')
 
-        /* floating doodle blobs */
-        .blob {
-            position: fixed;
-            border-radius: 50%;
-            filter: blur(2px);
-            opacity: 0.5;
-            z-index: 0;
-            animation: float 9s ease-in-out infinite;
-        }
-        .blob.b1 { top: 8%; left: 4%; width: 70px; height: 70px; background: var(--yellow); animation-delay: 0s; }
-        .blob.b2 { top: 65%; right: 6%; width: 50px; height: 50px; background: var(--mint); animation-delay: 2s; }
-        .blob.b3 { bottom: 10%; left: 10%; width: 36px; height: 36px; background: var(--pink); animation-delay: 4s; }
+<!-- ================= HERO ================= -->
 
-        @keyframes float {
-            0%, 100% { transform: translateY(0) rotate(0deg); }
-            50% { transform: translateY(-18px) rotate(8deg); }
-        }
+<div class="hero-section mb-5">
 
-        /* ===== NAVBAR ===== */
-        .navbar {
-            display: flex;
-            align-items: center;
-            background: rgba(255, 255, 255, 0.75);
-            backdrop-filter: blur(12px);
-            border-bottom: 2px solid var(--line);
-            position: sticky;
-            top: 0;
-            z-index: 100;
-        }
+    <div class="row align-items-center">
 
-        .navbar .container {
-            width: 100%;
-            max-width: 1080px;
-            margin: 0 auto;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 16px 24px;
-        }
+        <div class="col-lg-7">
 
-        .navbar-brand {
-            color: var(--ink);
-            font-family: 'Baloo 2', sans-serif;
-            font-size: 1.3rem;
-            font-weight: 700;
-            text-decoration: none;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
+            <span class="hero-badge">
 
-        .navbar-brand::before {
-            content: "🪪";
-            font-size: 1.3rem;
-            display: inline-block;
-            transform: rotate(-8deg);
-        }
+                OCR DOCUMENT SYSTEM
 
-        .navbar-nav {
-            display: flex;
-            gap: 6px;
-        }
+            </span>
 
-        .nav-link {
-            color: var(--ink-soft);
-            text-decoration: none;
-            padding: 9px 18px;
-            border-radius: 999px;
-            font-size: 0.92rem;
-            font-weight: 600;
-            transition: all 0.25s ease;
-        }
+            <h1 class="hero-title mt-3">
 
-        .nav-link:hover {
-            background: var(--pink);
-            color: var(--white);
-            transform: translateY(-1px);
-        }
+                Hệ thống nhận dạng và trích xuất
 
-        /* ===== PAGE LAYOUT ===== */
-        .page-wrapper {
-            max-width: 1080px;
-            margin: 0 auto;
-            padding: 56px 24px 80px;
-            position: relative;
-            z-index: 1;
-        }
+                <span class="text-primary">
 
-        .page-header {
-            text-align: center;
-            margin-bottom: 50px;
-        }
+                    tài liệu thông minh
 
-        .eyebrow {
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            background: var(--white);
-            border: 2px solid var(--line);
-            color: var(--pink-deep);
-            font-weight: 700;
-            font-size: 0.78rem;
-            letter-spacing: 0.3px;
-            padding: 6px 16px;
-            border-radius: 999px;
-            margin-bottom: 18px;
-        }
+                </span>
 
-        h1 {
-            font-family: 'Baloo 2', sans-serif;
-            color: var(--ink);
-            font-size: clamp(1.9rem, 4.5vw, 2.6rem);
-            font-weight: 800;
-            line-height: 1.2;
-        }
+            </h1>
 
-        h1 .accent {
-            color: var(--pink-deep);
-            position: relative;
-            display: inline-block;
-        }
+            <p class="hero-text mt-3">
 
-        .subtext {
-            margin-top: 12px;
-            color: var(--ink-soft);
-            font-size: 1rem;
-            font-weight: 500;
-            max-width: 46ch;
-            margin-left: auto;
-            margin-right: auto;
-        }
+                Hỗ trợ nhận dạng và trích xuất dữ liệu từ
 
-        h3, h5 {
-            font-family: 'Baloo 2', sans-serif;
-            font-weight: 700;
-            color: var(--ink);
-        }
+                CCCD, Hộ chiếu, Giấy khai sinh,
 
-        h3 { font-size: 1.15rem; }
-        h5 { font-size: 1.1rem; }
+                Học bạ, Bảng điểm, Bằng tốt nghiệp,
 
-        hr {
-            border: none;
-            height: 0;
-            margin: 40px 0;
-        }
+                Hồ sơ xét tuyển,
 
-        /* ===== BUBBLY PANELS ===== */
-        .panel {
-            position: relative;
-            background: var(--white);
-            border: 2.5px solid var(--line);
-            border-radius: 28px;
-            padding: 30px 32px;
-            margin-bottom: 10px;
-            box-shadow: 0 10px 0 -4px rgba(255, 143, 177, 0.18), 0 16px 32px -12px rgba(155, 125, 240, 0.18);
-            transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), border-color 0.3s ease, box-shadow 0.3s ease;
-        }
+                PDF, Word, Excel và nhiều loại tài liệu khác.
 
-        .panel:hover {
-            transform: translateY(-4px) rotate(-0.3deg);
-            border-color: var(--pink);
-            box-shadow: 0 14px 0 -4px rgba(255, 143, 177, 0.25), 0 22px 40px -12px rgba(155, 125, 240, 0.25);
-        }
+            </p>
 
-        .panel-head {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin-bottom: 20px;
-            gap: 14px;
-        }
+            <div class="hero-feature mt-4">
 
-        .panel-icon {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            width: 38px;
-            height: 38px;
-            border-radius: 14px;
-            font-size: 1.15rem;
-            margin-right: 10px;
-            flex-shrink: 0;
-        }
+                <span>
 
-        .panel-title-row { display: flex; align-items: center; }
+                    🪪 OCR
 
-        .panel-tag {
-            font-size: 0.74rem;
-            font-weight: 700;
-            color: var(--ink-soft);
-            background: var(--bg-2);
-            padding: 5px 12px;
-            border-radius: 999px;
-            white-space: nowrap;
-        }
+                </span>
 
-        /* ===== FORMS ===== */
-        form {
-            display: flex;
-            flex-wrap: wrap;
-            align-items: center;
-            gap: 12px;
-        }
+                <span>
 
-        input[type="file"],
-        .form-control {
-            flex: 1;
-            min-width: 220px;
-            padding: 12px 16px;
-            border: 2.5px dashed #e9d5e7;
-            border-radius: 16px;
-            background: var(--bg-2);
-            font-family: 'Quicksand', sans-serif;
-            font-size: 0.9rem;
-            font-weight: 500;
-            color: var(--ink);
-            cursor: pointer;
-            transition: border-color 0.25s ease, background 0.25s ease, transform 0.2s ease;
-        }
+                    📄 PDF
 
-        input[type="file"]::file-selector-button,
-        .form-control::file-selector-button {
-            font-family: 'Quicksand', sans-serif;
-            font-size: 0.78rem;
-            font-weight: 700;
-            color: var(--white);
-            background: var(--lilac-deep);
-            border: none;
-            border-radius: 999px;
-            padding: 7px 14px;
-            margin-right: 12px;
-            cursor: pointer;
-            transition: opacity 0.2s ease;
-        }
+                </span>
 
-        input[type="file"]:hover::file-selector-button,
-        .form-control:hover::file-selector-button {
-            opacity: 0.85;
-        }
+                <span>
 
-        input[type="file"]:hover {
-            border-color: var(--pink);
-            background: #fff5f8;
-        }
+                    📘 WORD
 
-        .form-control:hover {
-            border-color: var(--mint-deep);
-            background: #f1fcf8;
-        }
+                </span>
 
-        button {
-            border: none;
-            padding: 12px 26px;
-            border-radius: 999px;
-            font-family: 'Baloo 2', sans-serif;
-            font-size: 0.92rem;
-            font-weight: 700;
-            cursor: pointer;
-            color: var(--white);
-            transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.25s ease, filter 0.2s ease;
-            white-space: nowrap;
-        }
+                <span>
 
-        button:hover {
-            transform: translateY(-3px) scale(1.03);
-        }
+                    📊 EXCEL
 
-        button:active {
-            transform: translateY(0) scale(0.98);
-        }
+                </span>
 
-        form[action="/upload"] button {
-            background: linear-gradient(135deg, var(--pink), var(--pink-deep));
-            box-shadow: 0 6px 0 var(--pink-deep), 0 10px 20px -6px rgba(255, 111, 160, 0.5);
-        }
-        form[action="/upload"] button:hover {
-            box-shadow: 0 8px 0 var(--pink-deep), 0 14px 26px -6px rgba(255, 111, 160, 0.55);
-        }
-        form[action="/upload"] button:active {
-            box-shadow: 0 3px 0 var(--pink-deep);
-        }
+                <span>
 
-        .btn-success {
-            background: linear-gradient(135deg, var(--lilac), var(--lilac-deep));
-            box-shadow: 0 6px 0 var(--lilac-deep), 0 10px 20px -6px rgba(155, 125, 240, 0.5);
-        }
-        .btn-success:hover { box-shadow: 0 8px 0 var(--lilac-deep), 0 14px 26px -6px rgba(155, 125, 240, 0.55); }
-        .btn-success:active { box-shadow: 0 3px 0 var(--lilac-deep); }
+                    🤖 AI READY
 
-        .btn-warning {
-            background: linear-gradient(135deg, var(--mint), var(--mint-deep));
-            box-shadow: 0 6px 0 var(--mint-deep), 0 10px 20px -6px rgba(62, 207, 168, 0.5);
-        }
-        .btn-warning:hover { box-shadow: 0 8px 0 var(--mint-deep), 0 14px 26px -6px rgba(62, 207, 168, 0.55); }
-        .btn-warning:active { box-shadow: 0 3px 0 var(--mint-deep); }
-
-        /* ===== GRID ===== */
-        .grid-row {
-            display: grid;
-            grid-template-columns: 1.4fr 1fr;
-            gap: 24px;
-            align-items: start;
-        }
-
-        .col-md-4 { width: 100%; }
-
-        .card {
-            position: relative;
-            background: var(--white);
-            border: 2.5px solid var(--line);
-            border-radius: 28px;
-            overflow: visible;
-            box-shadow: 0 10px 0 -4px rgba(111, 227, 196, 0.2), 0 16px 32px -12px rgba(111, 227, 196, 0.2);
-            transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), border-color 0.3s ease, box-shadow 0.3s ease;
-            height: 100%;
-        }
-
-        .card:hover {
-            transform: translateY(-4px) rotate(0.3deg);
-            border-color: var(--mint-deep);
-            box-shadow: 0 14px 0 -4px rgba(111, 227, 196, 0.28), 0 22px 40px -12px rgba(111, 227, 196, 0.28);
-        }
-
-        .card-body { padding: 30px 28px; }
-        .card-body.text-center { text-align: left; }
-
-        .card-body.text-center form {
-            flex-direction: column;
-            align-items: stretch;
-            margin-top: 20px;
-        }
-
-        .card-body.text-center button { width: 100%; }
-
-        .shadow { box-shadow: none; }
-        .section { margin-bottom: 10px; }
-
-        /* footer */
-        .footnote {
-            margin-top: 52px;
-            padding: 16px 24px;
-            background: var(--white);
-            border: 2px solid var(--line);
-            border-radius: 999px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            flex-wrap: wrap;
-            gap: 10px;
-            font-size: 0.82rem;
-            font-weight: 600;
-            color: var(--ink-soft);
-        }
-
-        .footnote .dot {
-            display: inline-block;
-            width: 8px;
-            height: 8px;
-            border-radius: 50%;
-            background: var(--mint-deep);
-            margin-right: 8px;
-            box-shadow: 0 0 0 4px rgba(62, 207, 168, 0.18);
-        }
-
-        @media (max-width: 760px) {
-            .grid-row { grid-template-columns: 1fr; }
-        }
-
-        @media (max-width: 576px) {
-            .navbar .container { flex-direction: column; gap: 10px; padding: 14px 18px; }
-            .page-wrapper { padding: 40px 16px 60px; }
-            form { flex-direction: column; align-items: stretch; }
-            button { width: 100%; }
-            .panel, .card-body { padding: 24px 20px; }
-            .footnote { border-radius: 20px; justify-content: center; text-align: center; }
-        }
-    </style>
-</head>
-<body>
-
-    <span class="blob b1"></span>
-    <span class="blob b2"></span>
-    <span class="blob b3"></span>
-
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-
-        <div class="container">
-
-            <a class="navbar-brand" href="/dashboard">
-                OCR CCCD
-            </a>
-
-            <div class="navbar-nav">
-
-                <a class="nav-link" href="/">
-                    Upload OCR
-                </a>
-
-                <a class="nav-link" href="/documents">
-                    Danh sách hồ sơ
-                </a>
+                </span>
 
             </div>
 
         </div>
 
-    </nav>
+        <div class="col-lg-5">
 
-    <div class="page-wrapper">
+            <div class="system-card">
 
-        <div class="page-header">
-            <span class="eyebrow">✨ Trợ lý hồ sơ của bạn</span>
-            <h1>Hệ thống <span class="accent">OCR CCCD</span> 🌸</h1>
-            <p class="subtext">Tải ảnh CCCD, file Word hoặc Excel lên đây, để mình đọc giúp bạn nha!</p>
-        </div>
+                <div class="system-icon">
 
-        <div class="panel section">
-
-            <div class="panel-head">
-                <div class="panel-title-row">
-                    <span class="panel-icon" style="background:#ffe3ec;">🪪</span>
-                    <h3>Quét CCCD từ ảnh</h3>
-                </div>
-                <span class="panel-tag">Bước 1</span>
-            </div>
-
-            <form action="/upload" method="POST" enctype="multipart/form-data">
-
-                @csrf
-
-                <input type="file" name="image">
-
-                <button type="submit">
-                    Upload 💗
-                </button>
-
-            </form>
-
-        </div>
-
-        <hr>
-
-        <div class="grid-row">
-
-            <div class="panel section">
-
-                <div class="panel-head">
-                    <div class="panel-title-row">
-                        <span class="panel-icon" style="background:#ece3ff;">📄</span>
-                        <h3>Đọc file Word</h3>
-                    </div>
-                    <span class="panel-tag">.docx</span>
-                </div>
-
-                <form action="{{ route('upload.word') }}"
-                      method="POST"
-                      enctype="multipart/form-data">
-
-                    @csrf
-
-                    <input type="file"
-                           name="word_file"
-                           class="form-control">
-
-                    <br>
-
-                    <button class="btn btn-success">
-                        Đọc Word 💜
-                    </button>
-
-                </form>
-
-            </div>
-
-            <div class="col-md-4">
-
-                <div class="card shadow">
-
-                    <div class="card-body text-center">
-
-                        <div class="panel-head">
-                            <div class="panel-title-row">
-                                <span class="panel-icon" style="background:#dffaf2;">📊</span>
-                                <h5>Đọc file Excel</h5>
-                            </div>
-                            <span class="panel-tag">.xlsx</span>
-                        </div>
-
-                        <form action="{{ route('upload.excel') }}"
-                              method="POST"
-                              enctype="multipart/form-data">
-
-                            @csrf
-
-                            <input type="file"
-                                   name="excel_file"
-                                   class="form-control">
-
-                            <br>
-
-                            <button class="btn btn-warning">
-                                Upload Excel 🌿
-                            </button>
-
-                        </form>
-
-                    </div>
+                    <i class="bi bi-file-earmark-text-fill"></i>
 
                 </div>
 
+                <h3>
+
+                    OCR Engine
+
+                </h3>
+
+                <p>
+
+                    Upload tài liệu
+
+                    →
+
+                    OCR
+
+                    →
+
+                    Trích xuất dữ liệu
+
+                    →
+
+                    Xuất Excel
+
+                </p>
+
             </div>
 
-        </div>
-
-        <div class="footnote">
-            <span><span class="dot"></span>Sẵn sàng nhận file của bạn rồi nè</span>
-            <span>Hỗ trợ JPG · PNG · DOCX · XLSX</span>
         </div>
 
     </div>
 
-</body>
-</html>
+</div>
+
+<!-- ================= THỐNG KÊ ================= -->
+
+<div class="row mb-5 g-4">
+
+    <div class="col-md-3">
+
+        <div class="info-card">
+
+            <div class="icon bg-primary">
+
+                <i class="bi bi-files"></i>
+
+            </div>
+
+            <h2>
+
+                10+
+
+            </h2>
+
+            <p>
+
+                Loại tài liệu
+
+            </p>
+
+        </div>
+
+    </div>
+
+    <div class="col-md-3">
+
+        <div class="info-card">
+
+            <div class="icon bg-success">
+
+                <i class="bi bi-image-fill"></i>
+
+            </div>
+
+            <h2>
+
+                JPG
+
+            </h2>
+
+            <p>
+
+                PNG • JPEG
+
+            </p>
+
+        </div>
+
+    </div>
+
+    <div class="col-md-3">
+
+        <div class="info-card">
+
+            <div class="icon bg-danger">
+
+                <i class="bi bi-file-earmark-pdf-fill"></i>
+
+            </div>
+
+            <h2>
+
+                PDF
+
+            </h2>
+
+            <p>
+
+                Multi Page OCR
+
+            </p>
+
+        </div>
+
+    </div>
+
+    <div class="col-md-3">
+
+        <div class="info-card">
+
+            <div class="icon bg-warning">
+
+                <i class="bi bi-file-earmark-excel-fill"></i>
+
+            </div>
+
+            <h2>
+
+                XLSX
+
+            </h2>
+
+            <p>
+
+                Export Data
+
+            </p>
+
+        </div>
+
+    </div>
+
+</div>
+
+<!-- ================= UPLOAD ================= -->
+
+<div class="upload-card">
+
+    <div id="dropZone">
+
+        <div class="upload-circle">
+
+            <i class="bi bi-cloud-arrow-up-fill"></i>
+
+        </div>
+
+        <h2 class="mt-4">
+
+            Kéo và thả tài liệu vào đây
+
+        </h2>
+
+        <p class="text-muted">
+
+            Hỗ trợ JPG • PNG • PDF • DOC • DOCX • XLS • XLSX
+
+        </p>
+
+        <button
+
+            type="button"
+
+            id="chooseFile"
+
+            class="btn btn-primary btn-lg px-5">
+
+            <i class="bi bi-folder2-open me-2"></i>
+
+            Chọn tài liệu
+
+        </button>
+
+        <input
+
+            type="file"
+
+            id="documentFile"
+
+            hidden>
+
+    </div>
+
+</div>
+
+<div class="mt-5">
+
+    <div class="row">
+
+        <div class="col-lg-8">
+
+            <div class="card-box">
+
+                <h3 class="mb-4">
+
+                    <i class="bi bi-info-circle-fill text-primary me-2"></i>
+
+                    Thông tin tài liệu
+
+                </h3>
+                <div class="row mt-4">
+
+    <!-- Preview -->
+
+    <div class="col-lg-5">
+
+        <div class="card-box h-100">
+
+            <div class="d-flex justify-content-between align-items-center mb-3">
+
+                <h4 class="mb-0">
+
+                    <i class="bi bi-image-fill text-primary me-2"></i>
+
+                    Xem trước
+
+                </h4>
+
+                <span class="badge bg-primary">
+
+                    Preview
+
+                </span>
+
+            </div>
+
+            <div class="preview-box">
+
+                <img
+
+                    id="previewImage"
+
+                    src="https://placehold.co/500x650?text=No+Preview"
+
+                    class="img-fluid"
+
+                    alt="preview">
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+
+    <!-- Thông tin -->
+
+    <div class="col-lg-7">
+
+        <div class="card-box h-100">
+
+            <h4 class="mb-4">
+
+                <i class="bi bi-file-earmark-text-fill text-primary me-2"></i>
+
+                Thông tin tài liệu
+
+            </h4>
+
+            <table class="table align-middle">
+
+                <tbody>
+
+                <tr>
+
+                    <th width="180">
+
+                        Tên tài liệu
+
+                    </th>
+
+                    <td id="fileName">
+
+                        Chưa có dữ liệu
+
+                    </td>
+
+                </tr>
+
+                <tr>
+
+                    <th>
+
+                        Kích thước
+
+                    </th>
+
+                    <td id="fileSize">
+
+                        --
+
+                    </td>
+
+                </tr>
+
+                <tr>
+
+                    <th>
+
+                        Định dạng
+
+                    </th>
+
+                    <td id="fileType">
+
+                        --
+
+                    </td>
+
+                </tr>
+
+                <tr>
+
+                    <th>
+
+                        Độ phân giải
+
+                    </th>
+
+                    <td id="fileResolution">
+
+                        --
+
+                    </td>
+
+                </tr>
+
+                <tr>
+
+                    <th>
+
+                        Ngày tải lên
+
+                    </th>
+
+                    <td>
+
+                        {{ now()->format('d/m/Y H:i') }}
+
+                    </td>
+
+                </tr>
+
+                <tr>
+
+                    <th>
+
+                        Trạng thái
+
+                    </th>
+
+                    <td>
+
+                        <span id="statusBadge"
+
+                              class="badge bg-secondary">
+
+                            Chưa xử lý
+
+                        </span>
+
+                    </td>
+
+                </tr>
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+
+<!-- ================= Document Type ================= -->
+
+<div class="card-box mt-5">
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+
+        <h3>
+
+            <i class="bi bi-card-checklist text-primary me-2"></i>
+
+            Loại tài liệu
+
+        </h3>
+
+        <span class="text-muted">
+
+            Chọn hoặc để hệ thống tự nhận diện
+
+        </span>
+
+    </div>
+
+    <div class="row g-3">
+
+        <div class="col-md-3">
+
+            <div class="doc-card active"
+
+                 data-type="auto">
+
+                🤖
+
+                <h5>Tự động</h5>
+
+                <small>Auto Detect</small>
+
+            </div>
+
+        </div>
+
+        <div class="col-md-3">
+
+            <div class="doc-card"
+
+                 data-type="cccd">
+
+                🪪
+
+                <h5>CCCD</h5>
+
+                <small>Căn cước công dân</small>
+
+            </div>
+
+        </div>
+
+        <div class="col-md-3">
+
+            <div class="doc-card"
+
+                 data-type="passport">
+
+                🛂
+
+                <h5>Passport</h5>
+
+                <small>Hộ chiếu</small>
+
+            </div>
+
+        </div>
+
+        <div class="col-md-3">
+
+            <div class="doc-card"
+
+                 data-type="birth">
+
+                📜
+
+                <h5>Khai sinh</h5>
+
+                <small>Birth Certificate</small>
+
+            </div>
+
+        </div>
+
+        <div class="col-md-3">
+
+            <div class="doc-card"
+
+                 data-type="report">
+
+                📚
+
+                <h5>Học bạ</h5>
+
+                <small>School Report</small>
+
+            </div>
+
+        </div>
+
+        <div class="col-md-3">
+
+            <div class="doc-card"
+
+                 data-type="transcript">
+
+                📄
+
+                <h5>Bảng điểm</h5>
+
+                <small>Transcript</small>
+
+            </div>
+
+        </div>
+
+        <div class="col-md-3">
+
+            <div class="doc-card"
+
+                 data-type="degree">
+
+                🎓
+
+                <h5>Bằng TN</h5>
+
+                <small>Graduation</small>
+
+            </div>
+
+        </div>
+
+        <div class="col-md-3">
+
+            <div class="doc-card"
+
+                 data-type="other">
+
+                📁
+
+                <h5>Khác</h5>
+
+                <small>Other</small>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <input
+
+        type="hidden"
+
+        id="documentType"
+
+        value="auto">
+
+</div>
+
+
+
+<!-- ================= OCR OPTION ================= -->
+
+<div class="card-box mt-5">
+
+    <h3 class="mb-4">
+
+        <i class="bi bi-sliders text-primary me-2"></i>
+
+        Thiết lập OCR
+
+    </h3>
+
+    <div class="row">
+
+        <div class="col-md-6">
+
+            <div class="form-check mb-3">
+
+                <input
+
+                    checked
+
+                    class="form-check-input"
+
+                    type="checkbox">
+
+                <label class="form-check-label">
+
+                    Tự động xoay ảnh
+
+                </label>
+
+            </div>
+
+            <div class="form-check mb-3">
+
+                <input
+
+                    checked
+
+                    class="form-check-input"
+
+                    type="checkbox">
+
+                <label class="form-check-label">
+
+                    Tăng độ tương phản
+
+                </label>
+
+            </div>
+
+            <div class="form-check">
+
+                <input
+
+                    checked
+
+                    class="form-check-input"
+
+                    type="checkbox">
+
+                <label class="form-check-label">
+
+                    Khử nhiễu hình ảnh
+
+                </label>
+
+            </div>
+
+        </div>
+
+        <div class="col-md-6">
+
+            <div class="form-check mb-3">
+
+                <input
+
+                    checked
+
+                    class="form-check-input"
+
+                    type="checkbox">
+
+                <label class="form-check-label">
+
+                    Trích xuất toàn bộ dữ liệu
+
+                </label>
+
+            </div>
+
+            <div class="form-check mb-3">
+
+                <input
+
+                    checked
+
+                    class="form-check-input"
+
+                    type="checkbox">
+
+                <label class="form-check-label">
+
+                    Lưu lịch sử OCR
+
+                </label>
+
+            </div>
+
+            <div class="form-check">
+
+                <input
+
+                    checked
+
+                    class="form-check-input"
+
+                    type="checkbox">
+
+                <label class="form-check-label">
+
+                    Xuất Excel sau khi xử lý
+
+                </label>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+<!-- ================= OCR PROCESS ================= -->
+
+<div class="card-box mt-5">
+
+    <h3 class="mb-4">
+
+        <i class="bi bi-diagram-3-fill text-primary me-2"></i>
+
+        Quy trình xử lý OCR
+
+    </h3>
+
+    <div class="ocr-timeline">
+
+        <div class="ocr-item active">
+
+            <div class="ocr-icon">
+
+                <i class="bi bi-upload"></i>
+
+            </div>
+
+            <span>Upload</span>
+
+        </div>
+
+        <div class="ocr-line"></div>
+
+        <div class="ocr-item">
+
+            <div class="ocr-icon">
+
+                <i class="bi bi-image"></i>
+
+            </div>
+
+            <span>Tiền xử lý</span>
+
+        </div>
+
+        <div class="ocr-line"></div>
+
+        <div class="ocr-item">
+
+            <div class="ocr-icon">
+
+                <i class="bi bi-search"></i>
+
+            </div>
+
+            <span>OCR</span>
+
+        </div>
+
+        <div class="ocr-line"></div>
+
+        <div class="ocr-item">
+
+            <div class="ocr-icon">
+
+                <i class="bi bi-file-earmark-text"></i>
+
+            </div>
+
+            <span>Trích xuất</span>
+
+        </div>
+
+        <div class="ocr-line"></div>
+
+        <div class="ocr-item">
+
+            <div class="ocr-icon">
+
+                <i class="bi bi-file-earmark-excel"></i>
+
+            </div>
+
+            <span>Excel</span>
+
+        </div>
+
+    </div>
+
+</div>
+
+<!-- ================= Progress ================= -->
+
+<div class="card-box mt-4">
+
+    <div class="d-flex justify-content-between mb-2">
+
+        <strong>
+
+            Tiến trình OCR
+
+        </strong>
+
+        <span id="progressText">
+
+            0%
+
+        </span>
+
+    </div>
+
+    <div class="progress" style="height:24px;">
+
+        <div
+
+            id="progressBar"
+
+            class="progress-bar progress-bar-striped progress-bar-animated"
+
+            style="width:0%">
+
+        </div>
+
+    </div>
+
+</div>
+
+<!-- ================= Upload Forms ================= -->
+
+<form id="imageForm"
+
+      action="/upload"
+
+      method="POST"
+
+      enctype="multipart/form-data"
+
+      style="display:none;">
+
+    @csrf
+
+    <input
+
+        type="file"
+
+        name="image"
+
+        id="imageInput">
+        <input type="hidden" name="documentType" id="imageDocType">
+
+</form>
+
+<form id="pdfForm"
+
+      action="{{ route('upload.pdf') }}"
+
+      method="POST"
+
+      enctype="multipart/form-data"
+
+      style="display:none;">
+
+    @csrf
+
+    <input
+
+        type="file"
+
+        name="pdf_file"
+
+        id="pdfInput">
+        <input type="hidden" name="documentType" id="pdfDocType">
+
+</form>
+
+<form id="wordForm"
+
+      action="{{ route('upload.word') }}"
+
+      method="POST"
+
+      enctype="multipart/form-data"
+
+      style="display:none;">
+
+    @csrf
+
+    <input
+
+        type="file"
+
+        name="word_file"
+
+        id="wordInput">
+        <input type="hidden" name="documentType" id="wordDocType">
+</form>
+
+<form id="excelForm"
+
+      action="{{ route('upload.excel') }}"
+
+      method="POST"
+
+      enctype="multipart/form-data"
+
+      style="display:none;">
+
+    @csrf
+
+    <input
+
+        type="file"
+
+        name="excel_file"
+
+        id="excelInput">
+        <input type="hidden" name="documentType" id="excelDocType">
+</form>
+
+<!-- ================= Buttons ================= -->
+
+<div class="text-center mt-5">
+
+    <button
+
+        type="button"
+
+        id="startOCR"
+
+        class="btn btn-primary btn-lg px-5">
+
+        <i class="bi bi-play-circle-fill me-2"></i>
+
+        Bắt đầu OCR
+
+    </button>
+
+    <button
+
+        type="button"
+
+        id="resetUpload"
+
+        class="btn btn-outline-secondary btn-lg ms-2">
+
+        <i class="bi bi-arrow-clockwise me-2"></i>
+
+        Làm mới
+
+    </button>
+
+    <button
+
+        type="button"
+
+        class="btn btn-success btn-lg ms-2"
+
+        disabled>
+
+        <i class="bi bi-file-earmark-excel-fill me-2"></i>
+
+        Xuất Excel
+
+    </button>
+
+</div>
+
+@if(session('success'))
+
+<div class="alert alert-success mt-4">
+
+    {{ session('success') }}
+
+</div>
+
+@endif
+
+@if($errors->any())
+
+<div class="alert alert-danger mt-4">
+
+    <ul class="mb-0">
+
+        @foreach($errors->all() as $error)
+
+        <li>{{ $error }}</li>
+
+        @endforeach
+
+    </ul>
+
+</div>
+
+@endif
+
+@endsection
+@section('extra_style')
+
+<style>
+
+.hero-section{
+    background:linear-gradient(135deg,#2563eb,#3b82f6);
+    border-radius:25px;
+    padding:60px;
+    color:white;
+}
+
+.hero-badge{
+    background:rgba(255,255,255,.18);
+    padding:8px 18px;
+    border-radius:30px;
+    font-size:14px;
+}
+
+.hero-title{
+    font-size:42px;
+    font-weight:700;
+}
+
+.hero-text{
+    opacity:.92;
+    line-height:1.8;
+}
+
+.hero-feature{
+    display:flex;
+    flex-wrap:wrap;
+    gap:10px;
+}
+
+.hero-feature span{
+    background:rgba(255,255,255,.18);
+    padding:8px 15px;
+    border-radius:30px;
+}
+
+.system-card{
+    background:white;
+    border-radius:20px;
+    padding:35px;
+    color:#222;
+    text-align:center;
+}
+
+.system-icon{
+    width:90px;
+    height:90px;
+    margin:auto;
+    border-radius:50%;
+    background:#2563eb;
+    color:white;
+    font-size:40px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+}
+
+.info-card{
+    background:white;
+    border-radius:18px;
+    padding:30px;
+    text-align:center;
+    transition:.3s;
+}
+
+.info-card:hover{
+    transform:translateY(-8px);
+    box-shadow:0 15px 35px rgba(0,0,0,.08);
+}
+
+.info-card .icon{
+    width:65px;
+    height:65px;
+    border-radius:50%;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    color:white;
+    font-size:28px;
+    margin:auto auto 15px;
+}
+
+.upload-card{
+    background:white;
+    border-radius:20px;
+    padding:40px;
+}
+
+#dropZone{
+    border:3px dashed #cbd5e1;
+    border-radius:20px;
+    padding:70px;
+    text-align:center;
+    transition:.35s;
+    cursor:pointer;
+}
+
+#dropZone:hover{
+    border-color:#2563eb;
+    background:#eef5ff;
+}
+
+#dropZone.drag{
+    background:#eaf3ff;
+    border-color:#2563eb;
+}
+
+.upload-circle{
+    width:120px;
+    height:120px;
+    margin:auto;
+    border-radius:50%;
+    background:#2563eb;
+    color:white;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    font-size:55px;
+}
+
+.preview-box{
+    height:500px;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    background:#f8fafc;
+    border-radius:18px;
+    overflow:hidden;
+}
+
+.preview-box img{
+    max-width:100%;
+    max-height:100%;
+}
+
+.doc-card{
+    background:white;
+    border:2px solid #e5e7eb;
+    border-radius:18px;
+    padding:25px;
+    cursor:pointer;
+    transition:.3s;
+    text-align:center;
+}
+
+.doc-card:hover{
+    transform:translateY(-6px);
+    border-color:#2563eb;
+}
+
+.doc-card.active{
+    background:#2563eb;
+    color:white;
+    border-color:#2563eb;
+}
+
+.ocr-timeline{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+}
+
+.ocr-item{
+    text-align:center;
+    flex:1;
+}
+
+.ocr-icon{
+    width:65px;
+    height:65px;
+    margin:auto;
+    border-radius:50%;
+    background:#edf2ff;
+    color:#2563eb;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:28px;
+}
+
+.ocr-item.active .ocr-icon{
+    background:#2563eb;
+    color:white;
+}
+
+.ocr-line{
+    flex:1;
+    height:4px;
+    background:#dbeafe;
+    margin:0 5px;
+}
+
+.progress{
+    border-radius:30px;
+}
+
+.progress-bar{
+    font-weight:bold;
+}
+
+</style>
+
+@endsection
+
+
+
+@section('extra_script')
+
+<script>
+
+let currentFile=null;
+
+const dropZone=document.getElementById("dropZone");
+const fileInput=document.getElementById("documentFile");
+
+dropZone.onclick=()=>fileInput.click();
+
+fileInput.onchange=function(){
+
+    if(this.files.length){
+
+        loadFile(this.files[0]);
+
+    }
+
+};
+
+dropZone.addEventListener("dragover",e=>{
+
+    e.preventDefault();
+
+    dropZone.classList.add("drag");
+
+});
+
+dropZone.addEventListener("dragleave",()=>{
+
+    dropZone.classList.remove("drag");
+
+});
+
+dropZone.addEventListener("drop",e=>{
+
+    e.preventDefault();
+
+    dropZone.classList.remove("drag");
+
+    if(e.dataTransfer.files.length){
+
+        loadFile(e.dataTransfer.files[0]);
+
+    }
+
+});
+
+function loadFile(file){
+
+    currentFile=file;
+
+    document.getElementById("fileName").innerHTML=file.name;
+
+    document.getElementById("fileSize").innerHTML=(file.size/1024/1024).toFixed(2)+" MB";
+
+    document.getElementById("fileType").innerHTML=file.type;
+
+    document.getElementById("statusBadge").className="badge bg-warning";
+
+    document.getElementById("statusBadge").innerHTML="Đã tải";
+
+    if(file.type.startsWith("image")){
+
+        const reader=new FileReader();
+
+        reader.onload=function(e){
+
+            document.getElementById("previewImage").src=e.target.result;
+
+            const img=new Image();
+
+            img.onload=function(){
+
+                document.getElementById("fileResolution").innerHTML=this.width+" x "+this.height;
+
+            }
+
+            img.src=e.target.result;
+
+        }
+
+        reader.readAsDataURL(file);
+
+    }
+
+}
+document.querySelectorAll(".doc-card").forEach(card=>{
+    card.onclick=function(){
+
+        document.querySelectorAll(".doc-card").forEach(c=>{
+            c.classList.remove("active");
+        });
+
+        this.classList.add("active");
+
+        const type = this.getAttribute("data-type");
+
+        document.getElementById("documentType").value = type;
+
+        console.log("Selected type:", type);
+    }
+});
+
+document.getElementById("startOCR").onclick=function(){
+
+    if(currentFile==null){
+
+        alert("Vui lòng chọn tài liệu!");
+
+        return;
+
+    }
+
+    let progress=0;
+
+    const bar=document.getElementById("progressBar");
+
+    const text=document.getElementById("progressText");
+
+    const timer=setInterval(()=>{
+
+        progress+=4;
+
+        bar.style.width=progress+"%";
+
+        bar.innerHTML=progress+"%";
+
+        text.innerHTML=progress+"%";
+
+        if(progress>=100){
+
+            clearInterval(timer);
+
+            submitOCR();
+
+        }
+
+    },70);
+
+};
+
+
+function submitOCR(){
+    const docType = document.getElementById("documentType").value;
+document.getElementById("imageDocType").value = docType;
+document.getElementById("pdfDocType").value = docType;
+document.getElementById("wordDocType").value = docType;
+document.getElementById("excelDocType").value = docType;
+
+    const ext=currentFile.name.split('.').pop().toLowerCase();
+
+    const dt=new DataTransfer();
+
+    dt.items.add(currentFile);
+
+    if(["jpg","jpeg","png","bmp","webp"].includes(ext)){
+
+        imageInput.files=dt.files;
+
+        imageForm.submit();
+
+    }
+
+    else if(ext==="pdf"){
+
+        pdfInput.files=dt.files;
+
+        pdfForm.submit();
+
+    }
+
+    else if(ext==="doc"||ext==="docx"){
+
+        wordInput.files=dt.files;
+
+        wordForm.submit();
+
+    }
+
+    else if(ext==="xls"||ext==="xlsx"){
+
+        excelInput.files=dt.files;
+
+        excelForm.submit();
+
+    }
+
+    else{
+
+        alert("Định dạng chưa hỗ trợ.");
+
+    }
+
+}
+
+document.getElementById("resetUpload").onclick=function(){
+
+    location.reload();
+
+};
+
+</script>
+
+@endsection

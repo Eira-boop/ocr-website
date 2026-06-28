@@ -269,6 +269,27 @@
                 </div>
             </main>
         </div>
+        <br><br>
+
+<a href="{{ url()->previous() }}" class="btn-back">
+    ← Quay về
+</a>
+
+<style>
+.btn-back{
+    display:inline-block;
+    padding:10px 20px;
+    background:#0d6efd;
+    color:#fff;
+    text-decoration:none;
+    border-radius:6px;
+    font-weight:bold;
+}
+
+.btn-back:hover{
+    background:#0b5ed7;
+}
+</style>
 
         @if (Route::has('login'))
             <div class="h-14.5 hidden lg:block"></div>

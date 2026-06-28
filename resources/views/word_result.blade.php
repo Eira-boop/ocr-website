@@ -1,19 +1,13 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Kết quả Word</title>
+@extends('layouts.ocr')
 
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-</head>
-<body>
+@section('title', 'Kết quả Word')
 
-<div class="container mt-4">
+@section('content')
 
-    <h2>Nội dung file Word</h2>
+    <h1 class="page-title">Nội dung file Word</h1>
 
-    <pre>{{ $content }}</pre>
+    <div class="card-box">
+        <pre class="mb-0">{{ $content }}</pre>
+    </div>
 
-</div>
-
-</body>
-</html>
+@endsection

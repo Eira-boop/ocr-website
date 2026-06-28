@@ -1,61 +1,25 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Kết quả OCR mặt sau</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background: #f5f5f5;
-            padding: 30px;
-        }
-        .container {
-            width: 900px;
-            margin: auto;
-            background: white;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 0 10px rgba(0,0,0,0.1);
-        }
-        h2 { text-align: center; color: #16a34a; }
-        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-        table th, table td { border: 1px solid #ddd; padding: 12px; }
-        table th { background: #16a34a; color: white; width: 30%; }
-        .raw { margin-top: 30px; background: #f8f8f8; padding: 15px; border-radius: 5px; }
-        .btn { background: #2563eb; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; text-decoration: none; display: inline-block; margin-top: 20px; }
-        .btn:hover { background: #1d4ed8; }
-    </style>
-</head>
-<body>
-<div class="container">
+@extends('layouts.ocr')
 
-    <h2>THÔNG TIN CCCD MẶT SAU</h2>
+@section('title', 'Kết quả OCR mặt sau')
 
-    <table>
-        <tr>
-            <th>Ngày cấp</th>
-            <td>{{ $issueDate ?? '' }}</td>
-        </tr>
-        <tr>
-            <th>Ngày hết hạn</th>
-            <td>{{ $expireDate ?? '' }}</td>
-        </tr>
-        <tr>
-            <th>Nơi cấp</th>
-            <td>{{ $issuedBy ?? '' }}</td>
-        </tr>
-        <tr>
-            <th>Đặc điểm nhận dạng</th>
-            <td>{{ $features ?? '' }}</td>
-        </tr>
-    </table>
+@section('content')
 
-    <div class="raw">
-        <h3>Văn bản OCR gốc (mặt sau)</h3>
-        <pre>{{ $rawText }}</pre>
+    <h1 class="page-title">Kết quả OCR mặt sau</h1>
+
+    <div class="card-box">
+        <table class="table table-bordered">
+            <tr><th style="width:30%">Ngày cấp</th><td>{{ $issueDate ?? '' }}</td></tr>
+            <tr><th>Ngày hết hạn</th><td>{{ $expireDate ?? '' }}</td></tr>
+            <tr><th>Nơi cấp</th><td>{{ $issuedBy ?? '' }}</td></tr>
+            <tr><th>Đặc điểm nhận dạng</th><td>{{ $features ?? '' }}</td></tr>
+        </table>
+
+        <details class="mt-3">
+            <summary class="text-muted" style="cursor:pointer">Văn bản OCR gốc (mặt sau)</summary>
+            <pre class="bg-light p-3 rounded mt-2">{{ $rawText }}</pre>
+        </details>
+
+        <a href="javascript:history.back()" class="btn btn-primary mt-3">← Quay lại</a>
     </div>
 
-    <a href="javascript:history.back()" class="btn">← Quay lại</a>
-
-</div>
-</body>
-</html>
+@endsection
