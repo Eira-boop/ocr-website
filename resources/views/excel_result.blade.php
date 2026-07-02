@@ -17,5 +17,4 @@
             @endforeach
         </table>
     </div>
-
 @endsection

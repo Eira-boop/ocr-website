@@ -53,27 +53,43 @@ public function upload(Request $request)
     | TIỀN XỬ LÝ ẢNH (giúp Tesseract đọc rõ hơn)
     |--------------------------------------------------------------------------
     */
-    try {
-        $img = new \Imagick($imagePath);
+    try{
+$img = new \Imagick($imagePath);
 
-        // Chuyển ảnh xám
-        $img->transformImageColorspace(\Imagick::COLORSPACE_GRAY);
+// Tự xoay
+$img->autoOrient();
 
-        // Tăng sáng + tương phản nhẹ
-        $img->brightnessContrastImage(5, 25);
+// Tăng DPI
+$img->setImageResolution(300, 300);
 
-        // Làm nét nhẹ
-        $img->sharpenImage(0, 0.8);
+// Phóng to 4 lần
+$img->resizeImage(
+    $img->getImageWidth() * 4,
+    $img->getImageHeight() * 4,
+    \Imagick::FILTER_LANCZOS,
+    1
+);
 
-        // Tăng độ phân giải nếu ảnh nhỏ (giúp OCR đọc chữ nhỏ tốt hơn)
-        $geo = $img->getImageGeometry();
-        if ($geo['width'] < 1500) {
-            $img->resizeImage($geo['width'] * 2, $geo['height'] * 2, \Imagick::FILTER_LANCZOS, 1);
-        }
+// Chuyển xám
+$img->setImageColorspace(\Imagick::COLORSPACE_GRAY);
 
-        $img->writeImage($imagePath);
-        $img->clear();
-        $img->destroy();
+// Tăng tương phản
+$img->normalizeImage();
+
+// Khử nhiễu
+$img->despeckleImage();
+
+// Làm nét
+$img->unsharpMaskImage(1, 1, 1.5, 0.02);
+
+// Nhị phân hóa
+$img->thresholdImage(0.75 * \Imagick::getQuantum());
+
+$img->writeImage($imagePath);
+
+$img->clear();
+$img->destroy();
+
     } catch (\Exception $e) {
         // Nếu Imagick lỗi (vd thiếu extension), vẫn tiếp tục OCR ảnh gốc
     }

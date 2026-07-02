@@ -34,7 +34,7 @@
 
                 Hỗ trợ nhận dạng và trích xuất dữ liệu từ
 
-                CCCD, Hộ chiếu, Giấy khai sinh,
+                CCCD, Phiếu Đăng Ký Xét Tuyển, Giấy khai sinh,
 
                 Học bạ, Bảng điểm, Bằng tốt nghiệp,
 
@@ -539,10 +539,8 @@
 
                 🛂
 
-                <h5>Passport</h5>
-
-                <small>Hộ chiếu</small>
-
+                <h5>Phiếu Đăng Ký Xét Tuyển</h5>
+                <small>Admission Form</small>   
             </div>
 
         </div>

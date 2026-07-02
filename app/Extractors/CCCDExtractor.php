@@ -69,51 +69,69 @@ if (preg_match('/Giới\s*tính.*?(Nam|Nữ)/iu', $text, $match)) {
 } elseif (preg_match('/Sex.*?(Male|Female)/iu', $text, $match)) {
     $data['gender'] = strtolower($match[1]) == 'male' ? 'Nam' : 'Nữ';
 }
+/*
+|-----------------------------------------
+| Họ tên
+|-----------------------------------------
+*/
 
-        /*
-        |-----------------------------------------
-        | Họ tên
-        |-----------------------------------------
-        */
+$lines = preg_split('/\R/', $text);
 
-        $lines = explode("\n", $text);
+foreach ($lines as $i => $line) {
 
-        foreach ($lines as $i => $line) {
+    if (
+        stripos($line, 'Họ') !== false ||
+        stripos($line, 'Full') !== false
+    ) {
 
-            if (
-                stripos($line, 'Họ') !== false ||
-                stripos($line, 'Full') !== false
-            ) {
+        // tìm tối đa 5 dòng phía dưới
+        for ($j = $i + 1; $j <= $i + 5; $j++) {
 
-                for ($j = $i + 1; $j <= $i + 3; $j++) {
+            if (!isset($lines[$j])) {
+                continue;
+            }
 
-                    if (!isset($lines[$j])) {
-                        continue;
-                    }
+            $candidate = trim($lines[$j]);
 
- $candidate = trim($lines[$j]);
+            // bỏ ký tự rác
+            $candidate = preg_replace('/[^A-ZÀ-Ỹa-zà-ỹ\s]/u', ' ', $candidate);
 
-// Chỉ giữ chữ và khoảng trắng
-$candidate = preg_replace('/[^A-ZÀ-Ỹa-zà-ỹ\s]/u', '', $candidate);
+            // gộp khoảng trắng
+            $candidate = preg_replace('/\s+/', ' ', $candidate);
 
-// Gộp nhiều khoảng trắng
-$candidate = preg_replace('/\s+/', ' ', $candidate);
+            $candidate = trim($candidate);
 
-// Xóa khoảng trắng đầu cuối
-$candidate = trim($candidate);
+            // bỏ các từ OCR hay sinh ra
+            $candidate = preg_replace('/\b(ES|RE|ER|EE|SE|SEX|NAM|NU)\b.*$/iu', '', $candidate);
 
-// Nếu phía sau xuất hiện các từ nhiễu như ES RE ER...
-$candidate = preg_replace('/\s+(ES|RE|ER|EE|SE)(\s+.*)?$/i', '', $candidate);
+            // chỉ lấy tên có ít nhất 2 từ
+            if (preg_match('/^[A-ZÀ-Ỹa-zà-ỹ ]+$/u', $candidate)) {
 
-if (mb_strlen($candidate) > 5) {
-    $data['full_name'] = strtoupper($candidate);
-    break 2;
-}
+                if (str_word_count($candidate) >= 2) {
+
+                    $data['full_name'] = mb_strtoupper($candidate);
+
+                    break 2;
                 }
             }
         }
+    }
+}
+/*
+|-----------------------------------------
+| Địa chỉ
+|-----------------------------------------
+*/
 
-        return $data;
+if (preg_match('/Nơi thường trú.*?\n(.+)/isu', $text, $m)) {
+
+    $address = trim($m[1]);
+
+    $address = preg_replace('/\s+/', ' ', $address);
+
+    $data['address'] = $address;
+}
+        
         /*
 |-----------------------------------------
 | Ngày cấp
@@ -143,5 +161,6 @@ if (preg_match('/Có giá trị đến.*?(\d{2}\/\d{2}\/\d{4})/su', $text, $m)) 
 if (preg_match('/Đặc điểm nhận dạng[:\s]*(.+)/iu', $text, $m)) {
     $data['features'] = trim($m[1]);
 }
+return $data;
     }
 }

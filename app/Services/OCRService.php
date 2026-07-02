@@ -18,20 +18,23 @@ class OCRService
             ->executable('C:\Program Files\Tesseract-OCR\tesseract.exe')
             ->tessdataDir('C:\Program Files\Tesseract-OCR\tessdata')
             ->lang('vie+eng')
-            ->psm(6)
-            ->oem(1)
+            ->oem(3)
+            ->psm(11)
             ->run();
     }
 
-    public function scan(string $imagePath, string $documentType = 'auto'): array
-    {
-        // Đọc OCR
-        $text = $this->read($imagePath);
+public function scan(string $imagePath, string $documentType = 'auto'): array
+{
+    // Đọc OCR
+    $text = $this->read($imagePath);
 
-        $extractor = $this->resolveExtractor($documentType, $text);
+    // Làm sạch các lỗi OCR phổ biến
+    $text = $this->cleanOCRText($text);
 
-        return $extractor->extract($text);
-    }
+    $extractor = $this->resolveExtractor($documentType, $text);
+
+    return $extractor->extract($text);
+}
 
     protected function resolveExtractor(string $documentType, string $text)
     {
@@ -93,4 +96,29 @@ foreach ($lines as $line) {
         // Fallback mặc định
         return new CCCDExtractor();
     }
+    protected function cleanOCRText(string $text): string
+{
+    $replace = [
+
+        'CONG DAN' => 'CÔNG DÂN',
+        'CAN CUOC' => 'CĂN CƯỚC',
+
+        'Viet Nan' => 'Việt Nam',
+        'Viet Nam' => 'Việt Nam',
+
+        'TP.HOM' => 'TP.HCM',
+
+        'Ng-Trai' => 'Nguyễn Trãi',
+        'Ng-Cu Trinh' => 'Nguyễn Cư Trinh',
+
+        'Quan' => 'Quận',
+
+    ];
+
+    return str_replace(
+        array_keys($replace),
+        array_values($replace),
+        $text
+    );
+}
 }
